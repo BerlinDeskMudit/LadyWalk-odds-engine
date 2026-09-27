@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  money-path-float-gate:
+    # Q01 — money is never a float.
+    # Cheap, runs on every change, and fails the build on a float in a money path.
+    name: No floats in money paths
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Look for float-typed money columns in migrations and schema
+        run: |
+          set -euo pipefail
+          PATTERN='\b(FLOAT|DOUBLE[[:space:]]+PRECISION|REAL|NUMERIC)\b'
+          HITS=$(git grep -nIE "$PATTERN" -- \
+            'migrations/**' 'schema/**' 'db/**' 'docs/schema.md' 2>/dev/null || true)
+          if [ -n "$HITS" ]; then
+            echo "::error::float-typed money column found. Money is BIGINT minor units."
+            echo "$HITS"
+            exit 1
+          fi
+          echo "no float-typed money columns"
+
+      - name: Look for float() in a Money-bearing path
+        run: |
+          set -euo pipefail
+          PATTERN='\bfloat\(|Float|Float64|fromDouble|:[[:space:]]*float\b'
+          HITS=$(git grep -nIE "$PATTERN" -- \
+            'src/**/money/**' 'src/**/wallet/**' 'src/**/ledger/**' \
+            'src/**/settle*/**' 'src/**/payout*/**' 2>/dev/null || true)
+          if [ -n "$HITS" ]; then
+            echo "::error::float found in a money path. Use the Money value type."
+            echo "$HITS"
+            exit 1
+          fi
+          echo "no floats in money paths"
+
+  qa-tracker-consistency:
+    # QA.md is generated. If someone hand-edits it, the index stops matching the issues.
+    name: QA.md is in sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every Qnn in QA.md has a numbered anchor and an issue link
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import re, sys, pathlib
+          text = pathlib.Path("QA.md").read_text(encoding="utf-8")
+          anchors = set(re.findall(r'<a id="q(\d{2})"></a>', text))
+          links = set(re.findall(r'issues/(\d+)\)', text))
+          if not anchors:
+              sys.exit("QA.md has no question anchors - was it overwritten?")
+          missing = sorted(a for a in anchors if a not in links)
+          if missing:
+              sys.exit(f"questions with an anchor but no issue link: {missing}")
+          if len(anchors) != 58:
+              sys.exit(f"expected 58 tracked questions, found {len(anchors)}")
+          print(f"{len(anchors)} questions tracked, all linked")
+          PY

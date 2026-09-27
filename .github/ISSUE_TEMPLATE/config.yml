@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/security/advisories/new
+    about: Do not file money-path or auth vulnerabilities as public issues.
+  - name: The question set (QA.md)
+    url: https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/blob/main/QA.md
+    about: Check whether your question is already tracked before filing a new one.

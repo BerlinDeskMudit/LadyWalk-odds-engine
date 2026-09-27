@@ -1,0 +1,50 @@
+# --- secrets: never commit ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+**/credentials*
+
+# --- money-path fixtures are synthetic, but a stray dump must never land ---
+*.sqlite
+*.sqlite3
+*.db
+ledger-dump*.csv
+*.dump
+pgdata/
+
+# --- language / toolchain ---
+node_modules/
+dist/
+build/
+out/
+.next/
+coverage/
+*.tsbuildinfo
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+target/
+*.class
+*.jar
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# --- local infra ---
+docker-compose.override.yml
+.env.local
+
+# --- editors / OS ---
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

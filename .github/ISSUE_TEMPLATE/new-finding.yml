@@ -1,0 +1,43 @@
+---
+name: New design question
+about: A question this project has not asked yet
+title: "[Qnn] <the question, asked as a question>"
+labels: []
+assignees: []
+---
+
+## The question
+
+> State it as a question a principal engineer would actually ask. Not a task, not a
+> feature request — a question with a defensible answer and a defensible alternative.
+
+## Why it belongs in the set
+
+What does the project currently get wrong, or fail to consider, because this is unasked?
+
+**Subsystem:** data-modeling · concurrency · odds-engine · realtime · settlement · reliability · architecture · security · observability · testing · deployment
+
+## Options I can see
+
+- **A —**
+- **B —**
+- **C —**
+
+## What an answer would have to produce
+
+An artefact, not a paragraph. Which one?
+
+- [ ] An ADR in `docs/adr/`
+- [ ] A benchmark or measurement
+- [ ] A test that fails against the pre-fix code
+- [ ] A schema change
+- [ ] A runbook
+- [ ] Other:
+
+## Rough priority and why
+
+`critical` (money-correctness or regulatory safety) · `high` (blocks a core guarantee) · `medium` · `low`
+
+---
+
+_Fold into [`QA.md`](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/blob/main/QA.md) and assign a `Qnn` number on merge._

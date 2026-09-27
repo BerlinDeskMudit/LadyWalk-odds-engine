@@ -1,0 +1,58 @@
+---
+name: Money-path bug
+about: A defect in bet placement, balance, ledger, or settlement
+title: "[bug] "
+labels: ["type:bug", "priority:critical"]
+assignees: []
+---
+
+> **Not for security vulnerabilities.** If an attacker can exploit this, use
+> [private reporting](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/security/advisories/new)
+> instead of a public issue.
+
+## What is wrong
+
+One sentence. The observable, incorrect behaviour.
+
+## Money impact
+
+Be specific and quantitative — this drives triage.
+
+- **Maximum loss per occurrence:**
+- **Requires concurrency?** (two simultaneous requests?)
+- **Requires a specific account state or timing?** (low balance, market close, settlement window, retry)
+- **Silent or loud?** Does it throw, or does it return a plausible wrong number?
+
+## Reproduction
+
+The exact request sequence. If it is a race, give the two concurrent requests and note that
+a loop is often needed to hit it.
+
+```
+1.
+2.
+3.
+```
+
+Deterministic? ☐ yes ☐ intermittent — hit rate: ____
+
+## Expected
+
+What the system should have done instead.
+
+## Root cause
+
+- [ ] Already identified — see below
+- [ ] Not yet identified
+
+If identified: the specific line, and **why the existing test suite did not catch it.**
+
+## The test that would have caught this
+
+Describe the regression test to add. It must fail against the current code.
+
+- [ ] Added, and verified to fail before the fix
+
+## Area
+
+`area:data-modeling` · `area:concurrency` · `area:settlement` · `area:security` · `area:reliability`
