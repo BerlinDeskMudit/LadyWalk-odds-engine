@@ -23,7 +23,7 @@ jobs:
           set -euo pipefail
           PATTERN='\b(FLOAT|DOUBLE[[:space:]]+PRECISION|REAL|NUMERIC)\b'
           HITS=$(git grep -nIE "$PATTERN" -- \
-            'migrations/**' 'schema/**' 'db/**' 'docs/schema.md' 2>/dev/null || true)
+            'migrations/**' 'schema/**' 'crates/**/migrations/**' 'db/**' 'docs/schema.md' 2>/dev/null || true)
           if [ -n "$HITS" ]; then
             echo "::error::float-typed money column found. Money is BIGINT minor units."
             echo "$HITS"
@@ -31,15 +31,19 @@ jobs:
           fi
           echo "no float-typed money columns"
 
-      - name: Look for float() in a Money-bearing path
+      - name: Look for a float in a Money-bearing Rust module
         run: |
           set -euo pipefail
-          PATTERN='\bfloat\(|Float|Float64|fromDouble|:[[:space:]]*float\b'
+          # f32/f64 and every explicit cast or conversion into them. `as f64` is the
+          # one that actually ships, so it is listed first.
+          PATTERN='\bas[[:space:]]+f(32|64)\b|\bf(32|64)::from\b|\bf(32|64)[[:space:]]*[,)=;]|\bmut[[:space:]]+x[[:space:]]*:[[:space:]]*f(32|64)\b'
           HITS=$(git grep -nIE "$PATTERN" -- \
-            'src/**/money/**' 'src/**/wallet/**' 'src/**/ledger/**' \
-            'src/**/settle*/**' 'src/**/payout*/**' 2>/dev/null || true)
+            'crates/*/src/money/**' 'crates/*/src/wallet/**' 'crates/*/src/ledger/**' \
+            'crates/*/src/odds/**' 'crates/*/src/settlement/**' 'crates/*/src/payout/**' \
+            'src/money/**' 'src/wallet/**' 'src/ledger/**' 'src/odds/**' \
+            'src/settlement/**' 'src/payout/**' 2>/dev/null || true)
           if [ -n "$HITS" ]; then
-            echo "::error::float found in a money path. Use the Money value type."
+            echo "::error::float found in a money path. Money is a newtype over i64 minor units."
             echo "$HITS"
             exit 1
           fi
@@ -51,20 +55,159 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Every Qnn in QA.md has a numbered anchor and an issue link
+      - name: Every Qnn in QA.md has a matching heading and exactly one issue link
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, re, sys
+
+          text = pathlib.Path("QA.md").read_text(encoding="utf-8")
+
+          # Split on the question anchors so each block can be checked as a unit.
+          parts = re.split(r'<a id="q(\d{2})"></a>', text)
+          if len(parts) < 3:
+              sys.exit("QA.md has no question anchors - was it overwritten?")
+
+          blocks = list(zip(parts[1::2], parts[2::2]))
+          if len(blocks) != 58:
+              sys.exit(f"expected 58 tracked questions, found {len(blocks)}")
+
+          seen_numbers, seen_issues = [], []
+          for anchor, block in blocks:
+              heading = re.search(r"####\s*Q(\d{2})\b", block)
+              if not heading:
+                  sys.exit(f"Q{anchor} has no '#### QNN' heading")
+              if heading.group(1) != anchor:
+                  sys.exit(f"anchor q{anchor} is followed by heading Q{heading.group(1)}")
+
+              # A question's own issue link is the "[Issue #N](.../issues/N)" line that
+              # directly follows its heading. Later links in the block are the index
+              # table for the *next* subsection, or in-prose cross references.
+              own = re.search(r"\[Issue #(\d+)\]\([^)]*/issues/(\d+)\)", block)
+              if not own:
+                  sys.exit(f"Q{anchor} has no '[Issue #N](.../issues/N)' link")
+              if own.group(1) != own.group(2):
+                  sys.exit(f"Q{anchor} label #{own.group(1)} does not match link {own.group(2)}")
+              if int(own.group(1)) != int(anchor):
+                  sys.exit(
+                      f"Q{anchor} points at issue #{int(own.group(1))}, "
+                      f"expected #{int(anchor)}"
+                  )
+              seen_numbers.append(int(anchor))
+              seen_issues.append(int(own.group(1)))
+
+          if len(set(seen_issues)) != len(seen_issues):
+              dupes = sorted({i for i in seen_issues if seen_issues.count(i) > 1})
+              sys.exit(f"issue links are not unique, reused: {dupes}")
+          if sorted(seen_issues) != list(range(1, 59)):
+              sys.exit("design issues are not #1-#58 exactly")
+          if seen_numbers != sorted(seen_numbers):
+              sys.exit("questions are not in ascending order")
+
+          # the per-subsection index tables link to #qNN anchors; a dangling one is a
+          # dead link a reader hits immediately
+          anchors_in_text = set(re.findall(r'<a id="q(\d{2})"></a>', text))
+          dangling = sorted(
+              t for t in re.findall(r"\]\(#q(\d{2})\)", text) if t not in anchors_in_text
+          )
+          if dangling:
+              sys.exit(f"index tables link to missing anchors: {dangling}")
+
+          print(f"{len(blocks)} questions tracked, each with exactly one unique issue link")
+          PY
+
+  roadmap-consistency:
+    # ROADMAP.md is generated from the build_*.json data files. A hand-edit that
+    # contradicts the data, or a dropped ID, fails here rather than misleading a
+    # contributor about what to work on next.
+    name: ROADMAP.md is in sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build IDs are complete and the milestone totals add up
         run: |
           set -euo pipefail
           python3 - <<'PY'
           import re, sys, pathlib
-          text = pathlib.Path("QA.md").read_text(encoding="utf-8")
-          anchors = set(re.findall(r'<a id="q(\d{2})"></a>', text))
-          links = set(re.findall(r'issues/(\d+)\)', text))
-          if not anchors:
-              sys.exit("QA.md has no question anchors - was it overwritten?")
-          missing = sorted(a for a in anchors if a not in links)
-          if missing:
-              sys.exit(f"questions with an anchor but no issue link: {missing}")
-          if len(anchors) != 58:
-              sys.exit(f"expected 58 tracked questions, found {len(anchors)}")
-          print(f"{len(anchors)} questions tracked, all linked")
+
+          text = pathlib.Path("ROADMAP.md").read_text(encoding="utf-8")
+          if not text.strip():
+              sys.exit("ROADMAP.md is empty")
+
+          # Every task and epic appears as a table row linking to its issue.
+          # Anchoring on the link form (not a bare mention) is deliberate: the prose
+          # writes ranges like `H-001`-`H-050`, which would otherwise satisfy a naive
+          # "does this id appear anywhere" test even if the task row were deleted.
+          linked = re.findall(r"\[((?:EP|F|H)-(\d+))\]\([^)]*/issues/\d+\)", text)
+          widths = {"EP": (1, 15, 2), "F": (1, 195, 3), "H": (1, 50, 3)}
+          seen = {p: [] for p in widths}
+          for full, num in linked:
+              prefix = full.split("-")[0]
+              if prefix not in seen:
+                  sys.exit(f"unexpected build id in ROADMAP.md: {full}")
+              seen[prefix].append(int(num))
+
+          total_expected = 0
+          for prefix, (lo, hi, _width) in widths.items():
+              nums = seen[prefix]
+              want = list(range(lo, hi + 1))
+              missing = sorted(set(want) - set(nums))
+              extra = sorted(set(nums) - set(want))
+              if missing or extra:
+                  sys.exit(f"{prefix}: missing={missing} unexpected={extra}")
+              total_expected += len(want)
+
+              if prefix in ("F", "H"):
+                  # one task row per task, so a link must appear exactly once
+                  dupes = sorted({n for n in nums if nums.count(n) > 1})
+                  if dupes:
+                      sys.exit(f"{prefix} has duplicated task rows: {dupes}")
+              else:
+                  # epics are linked twice on purpose: once in the milestone summary
+                  # table, once as their own section heading. Check the section exists
+                  # rather than hardcoding the multiplicity.
+                  sections = re.findall(r"^### \[(EP-\d+)\]", text, re.M)
+                  no_section = sorted(set(f"EP-{n:02d}" for n in want) - set(sections))
+                  if no_section:
+                      sys.exit(f"epics with no '### [EP-nn]' section: {no_section}")
+
+          links = {int(n) for n in re.findall(r"/issues/(\d+)", text)}
+          if not links:
+              sys.exit("ROADMAP.md has no issue links - was it overwritten?")
+          if len(links) != total_expected:
+              sys.exit(
+                  f"ROADMAP.md references {len(links)} distinct issues, "
+                  f"expected {total_expected}"
+              )
+          if not re.search(r"\*\*260 issues across", text):
+              sys.exit("ROADMAP.md no longer states the 260-issue total")
+
+          print(f"roadmap intact: {total_expected} tasks/epics, {len(links)} distinct issues")
           PY
+
+  docs-links:
+    name: Documentation links resolve
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Relative links point at files that exist
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, re, sys
+          bad = []
+          for md in pathlib.Path(".").rglob("*.md"):
+              if ".git" in md.parts:
+                  continue
+              for target in re.findall(r"\]\((?!https?://|#)([^)#]+)", md.read_text(encoding="utf-8")):
+                  if not (md.parent / target).exists():
+                      bad.append(f"{md}: {target}")
+          if bad:
+              sys.exit("broken relative links:\n  " + "\n  ".join(sorted(bad)))
+          print("all relative markdown links resolve")
+          PY
+
+# Rust toolchain gates (fmt, clippy at pedantic with warnings denied, cargo test,
+# sqlx offline metadata verification) are added in F-005 / F-186, once the Cargo
+# workspace exists. They are not stubbed here, because a CI job that cannot pass
+# teaches contributors to ignore CI.
