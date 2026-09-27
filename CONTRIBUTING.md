@@ -2,6 +2,17 @@
 
 Thanks for looking. This project is a **design-first** open-source build, and the contribution model follows from that.
 
+There are two tracks of work, and they close differently:
+
+| Track | What it is | Closes when |
+| --- | --- | --- |
+| **Design** · [`QA.md`](QA.md) · 58 questions | Open decisions that block the build. `Q01`–`Q58`. | A decision artefact is committed — an ADR, a benchmark, a failing test. |
+| **Build** · [`ROADMAP.md`](ROADMAP.md) · 260 issues | The implementation. `EP-01`–`EP-15` epics, `F-xxx` tasks, `H-xxx` hardening. | The code merges and every acceptance criterion is demonstrably met. |
+
+A design question is answered by a decision. A build task is answered by merged code. Keeping them
+separate is what stops a design discussion from stalling behind an implementation, and an
+implementation from silently deciding a question nobody voted on.
+
 ## The one rule
 
 > An issue is closed when an **artefact is committed**, not when a paragraph is typed.
@@ -27,7 +38,15 @@ If you conclude an issue should be answered *differently* than the acceptance cr
 
 ## Claiming order
 
-Work `priority:critical` first, and within that, respect the dependency order in [`ARCHITECTURE.md`](ARCHITECTURE.md). The three questions that block most of the others:
+**If you are writing code**, work the build milestones in [`ROADMAP.md`](ROADMAP.md) — `B1`
+Foundations, then `B2` Money Path, then `B3` Product, then `B4` Hardening. That order is a
+dependency order, not a preference: `EP-04` builds the double-entry ledger before `EP-05` accepts a
+bet, because a bet is a ledger movement. Check the `blocked_by` line in the issue body before you
+start.
+
+**If you are settling a design question**, work `priority:critical` first, and within that,
+respect the dependency order in [`ARCHITECTURE.md`](ARCHITECTURE.md). The three questions that block
+most of the others:
 
 - **[Q15](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/15)** — fixed-odds, pari-mutuel, or exchange?
 - **[Q08](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/8)** — what serialises concurrent bets on a market?
@@ -94,4 +113,8 @@ Open an issue using the **New finding** template. Give it an `area:` label and a
 
 ## Code of conduct
 
-Be accurate and be kind. Correctness is the contribution; being right about the code matters more than being attached to an idea. Critique the design, never the person.
+Be accurate and be kind. Correctness is the contribution; being right about the code matters more
+than being attached to an idea. Critique the design, never the person.
+
+The full expectations, the betting-specific provisions, and how to report a concern privately are
+in [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).

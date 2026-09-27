@@ -2,9 +2,10 @@
 
 **An open-source betting platform, built in public, designed to survive the questions a principal engineer asks before signing off.**
 
-> **Status: design phase.** This repository currently contains the *question set* and the *tracker*, not an implementation. That is deliberate. The hard part of a betting platform is not writing a bet-placement endpoint — it is the 58 design questions in [`QA.md`](QA.md), each one a trap that has sunk a real production system. They are tracked as GitHub issues, and each will be closed with a committed artefact, not a paragraph.
+> **Status: design phase.** This repository currently contains the *question set* and the *roadmap*, not an implementation. That is deliberate. The hard part of a betting platform is not writing a bet-placement endpoint — it is the 58 design questions in [`QA.md`](QA.md) and the 260 build issues in [`ROADMAP.md`](ROADMAP.md), each one a trap that has sunk a real production system. They are tracked as GitHub issues, and each will be closed with a committed artefact, not a paragraph.
 
 [![Questions tracked](https://img.shields.io/badge/questions-58-informational)](QA.md)
+[![Build issues](https://img.shields.io/badge/roadmap-260%20issues-success)](ROADMAP.md)
 [![MVP](https://img.shields.io/badge/milestone-MVP-0%2F35-blue)](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/milestone/1)
 [![Portfolio Depth](https://img.shields.io/badge/milestone-Portfolio-0%2F20-blue)](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/milestone/2)
 [![Future Work](https://img.shields.io/badge/milestone-future-0%2F3-lightgrey)](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/milestone/3)
@@ -28,11 +29,13 @@ The point of tracking the questions publicly is that **"we thought about it" is 
 
 | | |
 | --- | --- |
-| [`QA.md`](QA.md) | The 58 questions, grouped by subsystem, each linked to its issue |
-| [All 58 issues](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues) | The actual work |
+| [`QA.md`](QA.md) | The 58 design questions, grouped by subsystem, each linked to its issue |
+| [`ROADMAP.md`](ROADMAP.md) | The 260-issue implementation plan, 15 epics, first commit to production |
+| [All 318 issues](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues) | The actual work |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to claim an issue, what "done" means, ADR conventions |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Which decisions are still open, and which issues will close them |
 | [`SECURITY.md`](SECURITY.md) | Reporting a vulnerability in the money path |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Expectations, and how to report a concern privately |
 
 ## The questions at a glance
 
@@ -61,31 +64,56 @@ The two `bug` issues are the ones that would have been shipped by accident:
 
 ## Issue scheme
 
-**Milestones encode phase, not urgency:**
+318 issues on two tracks. They are kept separate deliberately: a **question** is answered by a
+decision, a **task** is answered by merged code.
 
-| Milestone | Count | Meaning |
-| --- | --: | --- |
-| **MVP** | 35 | Needed before the platform can honestly be called shippable |
-| **Portfolio Depth** | 20 | Separates a working demo from a defensible design |
-| **Future Work** | 3 | Not needed yet — document the design and the trigger that would make it real |
+| Track | IDs | Count | Milestones |
+| --- | --- | --: | --- |
+| **Design** — [`QA.md`](QA.md) | `Q01`–`Q58` | 58 | MVP (35) · Portfolio Depth (20) · Future Work (3) |
+| **Build** — [`ROADMAP.md`](ROADMAP.md) | `EP-01`–`EP-15`, `F-001`–`F-195`, `H-001`–`H-050` | 260 | B1 Foundations (31) · B2 Money Path (88) · B3 Product (61) · B4 Hardening (80) |
 
-**Labels:** `type:` (`feat` `bug` `task` `spike`) · `area:` (11 subsystems) · `phase:` · `priority:` (`critical` `high` `medium` `low`).
+The build milestones are a **dependency order**, not a priority ranking. The ledger (`EP-04`)
+exists before bet placement (`EP-05`), because a bet is a ledger movement and not a row insert.
 
-Every question is ranked `priority:critical` if getting it wrong loses money or breaks a regulatory guarantee. 16 of the 58 are critical.
+**Labels.** Every issue carries exactly one `type:`, one `area:`, one `priority:`, and a milestone.
+
+- `type:` — `feat` `bug` `task` `chore` `epic` `spike`
+- `area:` — 11 design subsystems plus `tooling` `infra` `identity` `api-sdk` `frontend` `release`
+- `priority:` — `critical` `high` `medium` `low`
+- `phase:` — design track only (`mvp` `portfolio` `future`)
+- `track:build` — the build track
+
+Design questions are ranked `priority:critical` if getting them wrong loses money or breaks a
+regulatory guarantee: 16 of the 58. Across the build track, 84 of 260.
 
 ## Planned shape
 
 Not decided yet — the issues are the reason. What is already committed:
 
-- **Money is never a float.** A `Money` value type, `BIGINT` minor units in the database, and a CI gate that fails the build on a float anywhere in a money path. ([Q01](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/1))
-- **The ledger is the source of truth, not the balance.** `balance` is a derived projection. Every correction is a compensating entry. ([Q03](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/3))
-- **The server decides the price.** A short-lived, signed quote token. A client-supplied odds value is never trusted. ([Q19](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/19), [Q42](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/42))
-- **Every state change is audited, tamper-evidently.** Hash-chained, append-only, not writable by the application role. ([Q47](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/47))
-- **One switch stops all money movement.** A platform-wide kill switch that halts bet acceptance within seconds, with audited trigger authority. ([Q35](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/35))
+- **One backend language: Rust.** A single `Money` type across the whole system. A second language
+  would put a conversion boundary on the one value that must never be converted.
+- **Compile-time checked queries.** sqlx validates every query against the schema at build time and
+  the offline `.sqlx/` metadata is committed, so CI fails if a query drifts from the schema.
+- **Money is never a float.** A `Money` newtype over `i64` minor units, `BIGINT` in the database,
+  and a CI gate that fails the build on a float in a money path. ([Q01](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/1))
+- **The ledger is the source of truth, not the balance.** `balance` is a derived projection. Every
+  correction is a compensating entry. ([Q03](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/3))
+- **The server decides the price.** A short-lived, signed quote token. A client-supplied odds value
+  is never trusted. ([Q19](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/19), [Q42](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/42))
+- **Every state change is audited, tamper-evidently.** Hash-chained, append-only, not writable by
+  the application role. ([Q47](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/47))
+- **One switch stops all money movement.** A platform-wide kill switch that halts bet acceptance
+  within seconds, with audited trigger authority. ([Q35](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/35))
+
+Stack: Rust · Tokio · Axum · PostgreSQL 16 · Redis Streams · WebSockets · Next.js/TypeScript ·
+Keycloak/OIDC · OpenTelemetry · proptest · testcontainers-rs · k6 · GitHub Actions · Terraform.
+
+Deliberately **not** chosen: Kafka, an ORM, Kubernetes, and a second backend language. The reasons
+are in [`ROADMAP.md`](ROADMAP.md).
 
 The three decisions everything else hangs off, in order:
 
-1. **[Q15](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/15)** — fixed-odds, pari-mutuel, or exchange? These have completely different concurrency and liability models. Every other subsystem is downstream of this one.
+1. **[Q15](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/15)** — fixed-odds, pari-mutuel, or exchange? These have completely different concurrency and liability models. Every other subsystem is downstream of this one. **This is why the repository is not yet described as a fixed-odds engine.**
 2. **[Q08](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/8)** — what serialises concurrent bets on one market?
 3. **[Q36](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/36)** — are the wallet and bet placement separate failure domains from odds and market data?
 
