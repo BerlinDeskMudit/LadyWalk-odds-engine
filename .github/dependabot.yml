@@ -1,0 +1,53 @@
+# Automated dependency updates.
+#
+# Security updates land in their own PR by default, so an advisory fix is never
+# blocked behind an unrelated feature.
+
+version: 2
+
+updates:
+  # Keep the Actions runner image current. Node 20 actions are already
+  # deprecated on GitHub-hosted runners, and this is how that surfaces early.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    labels:
+      - tooling
+      - dependencies
+
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: build
+    labels:
+      - tooling
+      - dependencies
+    groups:
+      # One PR for the patch-level churn instead of forty.
+      cargo-patch:
+        update-types:
+          - patch
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: build
+    labels:
+      - tooling
+      - dependencies
+    groups:
+      npm-patch:
+        update-types:
+          - patch
+
+  - package-ecosystem: devcontainers
+    directory: /
+    schedule:
+      interval: monthly

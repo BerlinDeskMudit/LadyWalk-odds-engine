@@ -1,0 +1,28 @@
+# Code owners
+#
+# Every path that changes a contract, a money path, or a process needs a review
+# from someone who owns it. GitHub requests a review from these owners
+# automatically when a PR touches a matching path.
+#
+# NOTE: these are individuals, not teams. Teams do not exist yet. When a team is
+# created, replace the handle here — GitHub silently ignores an owner it cannot
+# resolve, so a typo in this file disables the review requirement without any
+# visible error. Verify after every change to this file by opening a throwaway
+# PR and confirming the reviewer is requested.
+
+# Default: the money path and the contracts below get the most scrutiny.
+# Last match wins, so the specific paths below override this.
+*                       @BerlinDeskMudit
+
+# Process and governance. Changing how people contribute needs maintainer sign-off.
+# This covers .github/CONTRIBUTING.md, .github/SECURITY.md and
+# .github/CODE_OF_CONDUCT.md, which GitHub reads from this directory.
+.github/               @BerlinDeskMudit
+
+# Design decisions and the schema. An ADR or schema change invalidates downstream
+# work, so it is reviewed before it lands rather than after.
+/docs/adr/             @BerlinDeskMudit
+/docs/architecture/    @BerlinDeskMudit
+
+# Continuous integration. A weakened gate is a silent regression.
+/.github/workflows/    @BerlinDeskMudit
