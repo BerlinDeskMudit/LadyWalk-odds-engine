@@ -1,5 +1,12 @@
 # Automated dependency updates.
 #
+# Only ecosystems whose manifest actually exists are listed. Dependabot treats a
+# configured ecosystem with no manifest as a hard error, and reports a red run
+# every cycle — which is how a green badge turns into noise nobody reads.
+#
+# To add one: create the manifest, add the block below, and confirm the first
+# run succeeds before assuming it is working.
+#
 # Security updates land in their own PR by default, so an advisory fix is never
 # blocked behind an unrelated feature.
 
@@ -18,36 +25,26 @@ updates:
       - tooling
       - dependencies
 
-  - package-ecosystem: cargo
-    directory: /
-    schedule:
-      interval: weekly
-    commit-message:
-      prefix: build
-    labels:
-      - tooling
-      - dependencies
-    groups:
-      # One PR for the patch-level churn instead of forty.
-      cargo-patch:
-        update-types:
-          - patch
+  # cargo — enable when the workspace lands (F-005)
+  #   - package-ecosystem: cargo
+  #     directory: /
+  #     schedule:
+  #       interval: weekly
+  #     commit-message:
+  #       prefix: build
+  #     labels: [tooling, dependencies]
+  #     groups:
+  #       cargo-patch:
+  #         update-types: [patch]
 
-  - package-ecosystem: npm
-    directory: /
-    schedule:
-      interval: weekly
-    commit-message:
-      prefix: build
-    labels:
-      - tooling
-      - dependencies
-    groups:
-      npm-patch:
-        update-types:
-          - patch
-
-  - package-ecosystem: devcontainers
-    directory: /
-    schedule:
-      interval: monthly
+  # npm — enable when the web workspace lands
+  #   - package-ecosystem: npm
+  #     directory: /
+  #     schedule:
+  #       interval: weekly
+  #     commit-message:
+  #       prefix: build
+  #     labels: [tooling, dependencies]
+  #     groups:
+  #       npm-patch:
+  #         update-types: [patch]
