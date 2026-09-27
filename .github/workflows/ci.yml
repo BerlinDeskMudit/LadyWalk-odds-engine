@@ -16,7 +16,7 @@ jobs:
     name: No floats in money paths
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Look for float-typed money columns in migrations and schema
         run: |
@@ -55,7 +55,7 @@ jobs:
     name: Open design questions are in sync
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Every Qnn has a matching heading and exactly one issue link
         run: |
           set -euo pipefail
@@ -124,7 +124,7 @@ jobs:
     name: Roadmap is in sync
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Build IDs are complete and the milestone totals add up
         run: |
           set -euo pipefail
@@ -190,7 +190,7 @@ jobs:
     name: Documentation links resolve
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Relative links point at files that exist
         run: |
           set -euo pipefail
