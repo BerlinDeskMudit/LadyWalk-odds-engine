@@ -49,24 +49,25 @@ jobs:
           fi
           echo "no floats in money paths"
 
-  qa-tracker-consistency:
-    # QA.md is generated. If someone hand-edits it, the index stops matching the issues.
-    name: QA.md is in sync
+  design-questions-consistency:
+    # docs/design/open-questions.md is generated. If someone hand-edits it, the
+    # index stops matching the issues.
+    name: Open design questions are in sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Every Qnn in QA.md has a matching heading and exactly one issue link
+      - name: Every Qnn has a matching heading and exactly one issue link
         run: |
           set -euo pipefail
           python3 - <<'PY'
           import pathlib, re, sys
 
-          text = pathlib.Path("QA.md").read_text(encoding="utf-8")
+          text = pathlib.Path("docs/design/open-questions.md").read_text(encoding="utf-8")
 
           # Split on the question anchors so each block can be checked as a unit.
           parts = re.split(r'<a id="q(\d{2})"></a>', text)
           if len(parts) < 3:
-              sys.exit("QA.md has no question anchors - was it overwritten?")
+              sys.exit("open-questions.md has no question anchors - was it overwritten?")
 
           blocks = list(zip(parts[1::2], parts[2::2]))
           if len(blocks) != 58:
@@ -117,10 +118,10 @@ jobs:
           PY
 
   roadmap-consistency:
-    # ROADMAP.md is generated from the build_*.json data files. A hand-edit that
-    # contradicts the data, or a dropped ID, fails here rather than misleading a
-    # contributor about what to work on next.
-    name: ROADMAP.md is in sync
+    # docs/roadmap.md is generated from the build_*.json data files. A hand-edit
+    # that contradicts the data, or a dropped ID, fails here rather than
+    # misleading a contributor about what to work on next.
+    name: Roadmap is in sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -130,9 +131,9 @@ jobs:
           python3 - <<'PY'
           import re, sys, pathlib
 
-          text = pathlib.Path("ROADMAP.md").read_text(encoding="utf-8")
+          text = pathlib.Path("docs/roadmap.md").read_text(encoding="utf-8")
           if not text.strip():
-              sys.exit("ROADMAP.md is empty")
+              sys.exit("docs/roadmap.md is empty")
 
           # Every task and epic appears as a table row linking to its issue.
           # Anchoring on the link form (not a bare mention) is deliberate: the prose
@@ -144,7 +145,7 @@ jobs:
           for full, num in linked:
               prefix = full.split("-")[0]
               if prefix not in seen:
-                  sys.exit(f"unexpected build id in ROADMAP.md: {full}")
+                  sys.exit(f"unexpected build id in docs/roadmap.md: {full}")
               seen[prefix].append(int(num))
 
           total_expected = 0
@@ -173,14 +174,14 @@ jobs:
 
           links = {int(n) for n in re.findall(r"/issues/(\d+)", text)}
           if not links:
-              sys.exit("ROADMAP.md has no issue links - was it overwritten?")
+              sys.exit("docs/roadmap.md has no issue links - was it overwritten?")
           if len(links) != total_expected:
               sys.exit(
-                  f"ROADMAP.md references {len(links)} distinct issues, "
+                  f"docs/roadmap.md references {len(links)} distinct issues, "
                   f"expected {total_expected}"
               )
           if not re.search(r"\*\*260 issues across", text):
-              sys.exit("ROADMAP.md no longer states the 260-issue total")
+              sys.exit("docs/roadmap.md no longer states the 260-issue total")
 
           print(f"roadmap intact: {total_expected} tasks/epics, {len(links)} distinct issues")
           PY

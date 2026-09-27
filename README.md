@@ -2,10 +2,10 @@
 
 **An open-source betting platform, built in public, designed to survive the questions a principal engineer asks before signing off.**
 
-> **Status: design phase.** This repository currently contains the *question set* and the *roadmap*, not an implementation. That is deliberate. The hard part of a betting platform is not writing a bet-placement endpoint — it is the 58 design questions in [`QA.md`](QA.md) and the 260 build issues in [`ROADMAP.md`](ROADMAP.md), each one a trap that has sunk a real production system. They are tracked as GitHub issues, and each will be closed with a committed artefact, not a paragraph.
+> **Status: design phase.** This repository currently contains the *question set* and the *roadmap*, not an implementation. That is deliberate. The hard part of a betting platform is not writing a bet-placement endpoint — it is the 58 design questions in [open design questions](docs/design/open-questions.md) and the 260 build issues in [Roadmap](docs/roadmap.md), each one a trap that has sunk a real production system. They are tracked as GitHub issues, and each will be closed with a committed artefact, not a paragraph.
 
-[![Questions tracked](https://img.shields.io/badge/questions-58-informational)](QA.md)
-[![Build issues](https://img.shields.io/badge/roadmap-260%20issues-success)](ROADMAP.md)
+[![Questions tracked](https://img.shields.io/badge/questions-58-informational)](docs/design/open-questions.md)
+[![Build issues](https://img.shields.io/badge/roadmap-260%20issues-success)](docs/roadmap.md)
 [![MVP](https://img.shields.io/badge/milestone-MVP-0%2F35-blue)](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/milestone/1)
 [![Portfolio Depth](https://img.shields.io/badge/milestone-Portfolio-0%2F20-blue)](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/milestone/2)
 [![Future Work](https://img.shields.io/badge/milestone-future-0%2F3-lightgrey)](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/milestone/3)
@@ -29,13 +29,15 @@ The point of tracking the questions publicly is that **"we thought about it" is 
 
 | | |
 | --- | --- |
-| [`QA.md`](QA.md) | The 58 design questions, grouped by subsystem, each linked to its issue |
-| [`ROADMAP.md`](ROADMAP.md) | The 260-issue implementation plan, 15 epics, first commit to production |
+| [open design questions](docs/design/open-questions.md) | The 58 design questions, grouped by subsystem, each linked to its issue |
+| [Roadmap](docs/roadmap.md) | The 260-issue implementation plan, 15 epics, first commit to production |
 | [All 318 issues](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues) | The actual work |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to claim an issue, what "done" means, ADR conventions |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Which decisions are still open, and which issues will close them |
-| [`SECURITY.md`](SECURITY.md) | Reporting a vulnerability in the money path |
-| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Expectations, and how to report a concern privately |
+| [Architecture](docs/architecture/README.md) | Which decisions are still open, and which issues will close them |
+| [Decision records](docs/adr/) | Why a decision was made, what was rejected, and what would reopen it |
+| [All documentation](docs/) | Index of everything written down about this system |
+| [Contributing](.github/CONTRIBUTING.md) | How to claim an issue, what "done" means, ADR conventions |
+| [Security](.github/SECURITY.md) | Reporting a vulnerability in the money path |
+| [Code of Conduct](.github/CODE_OF_CONDUCT.md) | Expectations, and how to report a concern privately |
 
 ## The questions at a glance
 
@@ -69,8 +71,8 @@ decision, a **task** is answered by merged code.
 
 | Track | IDs | Count | Milestones |
 | --- | --- | --: | --- |
-| **Design** — [`QA.md`](QA.md) | `Q01`–`Q58` | 58 | MVP (35) · Portfolio Depth (20) · Future Work (3) |
-| **Build** — [`ROADMAP.md`](ROADMAP.md) | `EP-01`–`EP-15`, `F-001`–`F-195`, `H-001`–`H-050` | 260 | B1 Foundations (31) · B2 Money Path (88) · B3 Product (61) · B4 Hardening (80) |
+| **Design** — [open design questions](docs/design/open-questions.md) | `Q01`–`Q58` | 58 | MVP (35) · Portfolio Depth (20) · Future Work (3) |
+| **Build** — [Roadmap](docs/roadmap.md) | `EP-01`–`EP-15`, `F-001`–`F-195`, `H-001`–`H-050` | 260 | B1 Foundations (31) · B2 Money Path (88) · B3 Product (61) · B4 Hardening (80) |
 
 The build milestones are a **dependency order**, not a priority ranking. The ledger (`EP-04`)
 exists before bet placement (`EP-05`), because a bet is a ledger movement and not a row insert.
@@ -109,7 +111,7 @@ Stack: Rust · Tokio · Axum · PostgreSQL 16 · Redis Streams · WebSockets · 
 Keycloak/OIDC · OpenTelemetry · proptest · testcontainers-rs · k6 · GitHub Actions · Terraform.
 
 Deliberately **not** chosen: Kafka, an ORM, Kubernetes, and a second backend language. The reasons
-are in [`ROADMAP.md`](ROADMAP.md).
+are in [Roadmap](docs/roadmap.md).
 
 The three decisions everything else hangs off, in order:
 
@@ -125,7 +127,7 @@ Legal and regulatory requirements (licensing, age verification, KYC, responsible
 
 ## Contributing
 
-Claim an issue, satisfy its acceptance criteria, close it with the artefact linked. See [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Claim an issue, satisfy its acceptance criteria, close it with the artefact linked. See [Contributing](.github/CONTRIBUTING.md).
 
 ## License
 

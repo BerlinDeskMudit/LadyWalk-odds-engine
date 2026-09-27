@@ -1,6 +1,10 @@
-# QA — L8 Design Sign-off Tracker
+# Open design questions
 
 > 58 questions a staff/principal engineer would force you to answer before signing off on the design. **One GitHub issue per question.** This file is the index; the issues are the work.
+
+This is the **design track**. The implementation track is the
+[roadmap](../roadmap.md), and the decisions that get made here land as ADRs in
+[`../adr/`](../adr/).
 
 [repo](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine) · [all 58 issues](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues) · [open](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues?q=is%3Aissue+is%3Aopen) · [closed](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues?q=is%3Aissue+is%3Aclosed) · [MVP milestone](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/milestone/1)
 
@@ -1189,4 +1193,4 @@ Milestones encode phase, not urgency:
 
 ## Adding a question
 
-Questions are not written by hand in two places. Edit `issues.json` in the generator, re-run it, and QA.md plus the GitHub issue are produced from the same source. New findings go in as issues with the `area:` label and get a `Qnn` number on merge.
+Questions are not written by hand in two places. Edit `issues.json` in the generator, re-run it, and this file plus the GitHub issue are produced from the same source. New findings go in as issues with the `area:` label and get a `Qnn` number on merge.

@@ -2,12 +2,15 @@
 
 **260 issues across 15 epics, ordered from the first commit to a defensible production claim.**
 
-This is the *build* track. The 58 questions in [`QA.md`](QA.md) are the *design* track: open
+This is the *build* track. The 58 questions in [open design questions](design/open-questions.md) are the *design* track: open
 decisions that need an artefact to close. The two are kept separate on purpose — a question is
 answered by a decision, a task is answered by merged code.
 
-- [Design track · 58 questions](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues?q=is%3Aissue+is%3Aopen+no%3Alabel+track%3Abuild) → [`QA.md`](QA.md)
-- [Build track · 260 issues](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues?q=is%3Aissue+is%3Aopen+label%3Atrack%3Abuild) → this file
+- **Design track** · 58 questions → [open design questions](design/open-questions.md)
+- **Build track** · 260 issues → this file
+
+This file is generated from the issue data. CI fails if it drifts from the
+issues, so change the source and regenerate rather than editing it by hand.
 
 ---
 
@@ -488,7 +491,7 @@ hardening task with no owning component never gets done.
 
 ## Technology decisions
 
-Committed in [`ARCHITECTURE.md`](ARCHITECTURE.md) and realised by the `B1` tasks. The two that
+Committed in [Architecture](architecture/README.md) and realised by the `B1` tasks. The two that
 constrain everything else:
 
 | Decision | Choice | Why |
@@ -518,7 +521,7 @@ Explicitly **not** chosen, and why:
 | `EP-01`–`EP-15` | 15 | Epics. Each links its tasks as a checklist. |
 | `F-001`–`F-195` | 195 | Feature, task, and chore work. |
 | `H-001`–`H-050` | 50 | Hardening and failure-mode work, attached to the epic it threatens. |
-| `Q01`–`Q58` | 58 | The design track, in [`QA.md`](QA.md). |
+| `Q01`–`Q58` | 58 | The design track, in [open design questions](design/open-questions.md). |
 
 **Labels.** Every build issue has exactly one `type:` (`feat` `bug` `task` `chore` `epic`), one
 `area:`, one `priority:` (`critical` `high` `medium` `low`), the `track:build` label, and a

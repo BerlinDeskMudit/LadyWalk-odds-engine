@@ -4,7 +4,7 @@
 
 ## Current state
 
-No implementation. 58 open questions tracked in [`QA.md`](QA.md), one issue each. 35 are in **MVP**, 20 in **Portfolio Depth**, 3 in **Future Work**.
+No implementation. 58 open questions tracked in [open design questions](../design/open-questions.md), one issue each. 35 are in **MVP**, 20 in **Portfolio Depth**, 3 in **Future Work**.
 
 ## The dependency spine
 
@@ -125,8 +125,17 @@ Everything except the money path is a candidate to be a module in one deployable
 
 ## Documents
 
-- [`QA.md`](QA.md) — the 58 questions and their issues
-- `docs/adr/` — architecture decision records (none yet)
+Written and maintained:
+
+- [Documentation index](../README.md) — everything in `docs/`
+- [open design questions](../design/open-questions.md) — the 58 questions and their issues
+- [Roadmap](../roadmap.md) — the 260-issue build plan
+- [Decision records](../adr/) — one file per decision; **none written yet**
+
+Referenced but **not yet written**, because the question that unblocks each one is
+still open. Listed as unwritten rather than stubbed, so a missing document is
+visible in review instead of being mistaken for an empty one:
+
 - `docs/schema.md` — ERD and the immutable/mutable column split (blocked on [Q02](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/2))
 - `docs/slos.md` — SLIs, SLOs, error budgets (blocked on [Q48](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/48))
 - `runbooks/` — cap breach, quarantined market, ledger imbalance, kill switch ([Q35](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/35), [Q51](https://github.com/BerlinDeskMudit/LadyWalk-odds-engine/issues/51))
